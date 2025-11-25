@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabut Hub - Zona Santai Keren</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 400% 400%;
+            animation: bgShift 15s ease infinite;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+            animation: slideIn 1.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            font-size: 3.5em;
+            margin: 0;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.7);
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 25px rgba(255, 255, 255, 0.7); }
+            to { text-shadow: 0 0 40px rgba(255, 255, 255, 1); }
+        }
+        
+        p {
+            font-size: 1.2em;
+            margin: 20px 0;
+            max-width: 600px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid white;
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+        }
+        
+        .quote {
+            margin-top: 30px;
+            font-style: italic;
+            font-size: 1.3em;
+            opacity: 0;
+            animation: fadeInQuote 3s 2s forwards;
+        }
+        
+        @keyframes fadeInQuote {
+            to { opacity: 1; }
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="container">
+        <h1>Gabut Hub</h1>
+        <p>Selamat datang di zona santai ultimate! Nongkrong virtual saat gabut, dengan efek keren buat pamer ke temen. Klik tombol di bawah untuk mulai party!</p>
+        <div class="buttons">
+            <button onclick="spawnConfetti()">Spawn Confetti!</button>
+            <button onclick="randomQuote()">Quote Gabut Random</button>
+            <button onclick="playMusic()">Musik Chill</button>
+        </div>
+        <div class="quote" id="quoteDisplay"></div>
+    </div>
+
+    <script>
+        // Confetti effect
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let confetti = [];
+        
+        function spawnConfetti() {
+            for (let i = 0; i < 100; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 5 + 2,
+                    d: Math.random() * 100,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    tilt: Math.random() * 10 - 10,
+                    tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+                    tiltAngle: 0
+                });
+            }
+            animateConfetti();
+        }
+        
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confetti.forEach((c, i) => {
+                c.tiltAngle += c.tiltAngleIncremental;
+                c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+                c.x += Math.sin(c.d);
+                c.tilt = Math.sin(c.tiltAngle - c.d / 3);
+                if (c.y > canvas.height) confetti.splice(i, 1);
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                ctx.fillStyle = c.color;
+                ctx.fill();
+            });
+            if (confetti.length) requestAnimationFrame(animateConfetti);
+        }
+        
+        // Random gabut quotes
+        const quotes = [
+            "Gabut level expert: Ngeliatin langit-langit sambil mikirin hidup.",
+            "Saat gabut, aku bisa nge-scroll TikTok selama 5 jam tanpa sadar.",
+            "Gabut adalah seni menunda-nunda yang sempurna.",
+            "Kalau lagi gabut, aku suka ngitung berapa kali aku berkedip per menit.",
+            "Gabut: Saat otak kosong tapi tangan sibuk nge-tap layar."
+        ];
+        
+        function randomQuote() {
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteDisplay').textContent = `"${quote}"`;
+        }
+        
+        // Chill music (opsional, ganti URL jika mau)
+        let audio = null;
+        function playMusic() {
+            if (!audio) {
+                audio = new Audio('https://www.soundjay.com/misc/sounds/ambient-music-01.wav'); // Ganti dengan URL musik chill Anda
+                audio.loop = true;
+                audio.volume = 0.3;
+            }
+            audio.paused ? audio.play() : audio.pause();
+        }
+        
+        // Resize canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
